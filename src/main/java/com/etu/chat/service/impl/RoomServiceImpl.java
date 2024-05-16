@@ -1,43 +1,40 @@
 package com.etu.chat.service.impl;
 
-import com.etu.chat.entity.Authority;
+import com.etu.chat.entity.ChatUser;
 import com.etu.chat.entity.Room;
-import com.etu.chat.repository.AuthorityRepository;
 import com.etu.chat.repository.RoomRepository;
+import com.etu.chat.service.AuthorityService;
+import com.etu.chat.service.ChatUserService;
 import com.etu.chat.service.RoomService;
+import com.etu.chat.service.exception.RoomNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.stream.StreamSupport;
-
-@Service
+@Service("roomService")
 @RequiredArgsConstructor
 class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
-    private final AuthorityRepository authorityRepository;
+    private final AuthorityService authorityService;
+    private final ChatUserService chatUserService;
 
     @Override
-    public Iterable<Room> getRooms() {
-        return roomRepository.findAll();
-    }
-
-    @Override
-    public Iterable<Room> findRoomsByPartialMatchName(String name) {
-        return StreamSupport.stream(roomRepository.findAll().spliterator(), false)
-                .filter(room -> room.getName().toLowerCase().contains(name.toLowerCase()))
-                .toList();
+    @Transactional
+    public Iterable<Room> getAvailableRooms(String username) {
+        return username.equals("admin") ? roomRepository.findAll() : chatUserService.find(username)
+                .map(ChatUser::getRooms).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
     @Override
     @Transactional
     public Room createRoom(Room room) {
-        Room newRoom = roomRepository.save(room);
-
-        authorityRepository.save(Authority.builder().
-                name("CAN_CRUD_" + room.getId())
+        Room newRoom = roomRepository.save(Room.builder()
+                .name(room.getName())
                 .build());
+
+        authorityService.createAuthorityForRoom(newRoom);
 
         return newRoom;
     }
@@ -46,28 +43,60 @@ class RoomServiceImpl implements RoomService {
     @Transactional
     public void deleteRoom(Room room) {
         Room roomFromDB = roomRepository.findById(room.getId())
-                .orElseThrow(() -> notFoundRoomException(room.getId()));
+                .orElseThrow(() -> new RoomNotFoundException(room.getId()));
 
-        authorityRepository.deleteByName("CAN_CRUD_" + roomFromDB.getId());
+        authorityService.deleteAuthorityForRoom(roomFromDB);
 
         roomRepository.delete(roomFromDB);
     }
 
     @Override
-    public Room editRoomName(Room room) {
-        return roomRepository.save(roomRepository.findById(room.getId())
+    public void editRoomName(Room room) {
+        roomRepository.save(roomRepository.findById(room.getId())
                 .map(r -> {
                     r.setName(room.getName());
                     return r;
-                }).orElseThrow(() -> notFoundRoomException(room.getId())));
+                }).orElseThrow(() -> new RoomNotFoundException(room.getId())));
     }
 
     @Override
     public Room getRoom(Long id) {
-        return roomRepository.findById(id).orElseThrow(() -> notFoundRoomException(id));
+        return roomRepository.findById(id).orElseThrow(() -> new RoomNotFoundException(id));
     }
 
-    private RuntimeException notFoundRoomException(long id) {
-        return new RuntimeException("Not found room with id = %s".formatted(id));
+    @Override
+    @Transactional
+    public void addUser(Room room, String username) {
+        Room roomFromDB = roomRepository.findById(room.getId())
+                .orElseThrow(() -> new RoomNotFoundException(room.getId()));
+
+       chatUserService.find(username).ifPresentOrElse(
+                user -> {
+                    roomFromDB.getChatUsers().add(user);
+                    roomRepository.save(roomFromDB);
+
+                },
+                () -> {
+                    throw new UsernameNotFoundException(username);
+                }
+        );
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Room room, String username) {
+        Room roomFromDB = roomRepository.findById(room.getId())
+                .orElseThrow(() -> new RoomNotFoundException(room.getId()));
+
+        chatUserService.find(username).ifPresentOrElse(
+                user -> {
+                    roomFromDB.getChatUsers().remove(user);
+                    roomRepository.save(roomFromDB);
+
+                },
+                () -> {
+                    throw new UsernameNotFoundException(username);
+                }
+        );
     }
 }

@@ -20,7 +20,7 @@ public class ChatUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDetails userDetails = chatUserRepository.findByName(username)
+        return chatUserRepository.findByName(username)
                 .map(user -> User.builder()
                         .username(user.getName())
                         .password(user.getPassword())
@@ -30,10 +30,6 @@ public class ChatUserDetailsService implements UserDetailsService {
                                 .toList())
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("Not found user with username = %s".formatted(username)));
-
-        System.out.println(userDetails);
-
-        return userDetails;
-        }
+    }
 
 }

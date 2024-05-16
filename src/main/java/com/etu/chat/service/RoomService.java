@@ -3,15 +3,17 @@ package com.etu.chat.service;
 import com.etu.chat.entity.Room;
 
 public interface RoomService {
-    Iterable<Room> getRooms();
+    Iterable<Room> getAvailableRooms(String username);
 
-    Iterable<Room> findRoomsByPartialMatchName(String name);
+    Room getRoom(Long id);
 
     Room createRoom(Room room);
 
     void deleteRoom(Room room);
 
-    Room editRoomName(Room room);
+    void editRoomName(Room room);
 
-    Room getRoom(Long id);
+    void addUser(Room room, String username);
+
+    void deleteUser(Room room, String username);
 }
