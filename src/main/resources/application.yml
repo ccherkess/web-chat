@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/chat_db
+    username: postgres
+    password: postgres
+  flyway:
+    schemas:
+      - public
+  jpa:
+    show-sql: true
+
+server:
+  port: 8080

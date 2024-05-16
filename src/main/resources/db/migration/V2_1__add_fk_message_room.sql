@@ -1,0 +1,1 @@
+alter table t_message add constraint fk_message_room foreign key (c_room_id) references t_room (id) on delete cascade;
