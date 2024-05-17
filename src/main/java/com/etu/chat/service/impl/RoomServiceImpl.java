@@ -74,7 +74,7 @@ class RoomServiceImpl implements RoomService {
                 user -> {
                     roomFromDB.getChatUsers().add(user);
                     roomRepository.save(roomFromDB);
-
+                    chatUserService.allowReadRoom(roomFromDB, username, true);
                 },
                 () -> {
                     throw new UsernameNotFoundException(username);
@@ -92,7 +92,8 @@ class RoomServiceImpl implements RoomService {
                 user -> {
                     roomFromDB.getChatUsers().remove(user);
                     roomRepository.save(roomFromDB);
-
+                    chatUserService.allowReadRoom(roomFromDB, username, false);
+                    chatUserService.allowWriteRoom(roomFromDB, username, false);
                 },
                 () -> {
                     throw new UsernameNotFoundException(username);
