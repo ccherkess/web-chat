@@ -1,5 +1,4 @@
 
-
 Vue.component('room-list', {
     data: function() {
        return {
