@@ -1,0 +1,86 @@
+body {
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+#app {
+    width: 70%;
+    max-width: 1500px;
+    min-width: 600px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.room-list h2 {
+    font-size: 40px;
+}
+
+.room-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.room-list li {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 30px;
+  justify-content: center;
+  text-align: center;
+}
+
+.room-list li:hover {
+  background-color: #e0e0e0;
+}
+
+.room-messages ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.room-messages li {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.room-messages form {
+    display: flex;
+    margin-top: 20px;
+}
+
+.room-messages input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px 0 0 8px;
+    outline: none;
+}
+
+.room-messages button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.room-messages button:hover {
+    background-color: #0056b3;
+}

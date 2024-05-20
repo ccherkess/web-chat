@@ -23,7 +23,7 @@ public class MessageController {
         return messageRepository.findByRoomId(roomId, PageRequest.of(page, 25));
     }
 
-    @PostMapping("/send")
+    @PostMapping("/{roomId}/send")
     public Message sendToRoom(@RequestBody Message message) {
         roomRepository.findById(message.getRoomId()).orElseThrow();
 
