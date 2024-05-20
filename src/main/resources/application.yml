@@ -8,6 +8,10 @@ spring:
       - public
   jpa:
     show-sql: true
+  http:
+    media-types:
+      css: text/css
+
 
 server:
   port: 8080
