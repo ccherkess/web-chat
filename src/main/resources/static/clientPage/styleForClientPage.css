@@ -44,9 +44,30 @@ body {
   background-color: #e0e0e0;
 }
 
+.room-messages {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    width: 100%;
+}
+
+.room-title {
+    flex-shrink: 0;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.messages-container {
+    flex-grow: 1;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
 .room-messages ul {
     list-style-type: none;
     padding: 0;
+    margin: 0;
 }
 
 .room-messages li {
@@ -55,6 +76,9 @@ body {
     border-radius: 8px;
     padding: 10px;
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .room-messages form {
@@ -82,5 +106,30 @@ body {
 }
 
 .room-messages button:hover {
+    background-color: #0056b3;
+}
+
+.room-messages .message-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.room-messages .message-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.room-messages .message-actions button {
+    padding: 5px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.room-messages .message-actions button:hover {
     background-color: #0056b3;
 }
