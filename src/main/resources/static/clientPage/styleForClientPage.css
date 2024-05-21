@@ -68,6 +68,8 @@ body {
     list-style-type: none;
     padding: 0;
     margin: 0;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
 }
 
 .room-messages li {
@@ -118,6 +120,11 @@ body {
 .room-messages .message-actions {
     display: flex;
     gap: 10px;
+}
+
+.room-messages .message-author {
+    font-weight: bold;
+    margin-left: 10px;
 }
 
 .room-messages .message-actions button {
