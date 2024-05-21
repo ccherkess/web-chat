@@ -5,7 +5,8 @@ Vue.component('room-messages', {
             messages: [],
             newMessage: '',
             editingMessage: null,
-            editedPayload: ''
+            editedPayload: '',
+            currentUser: {}
         };
     },
     template: `
@@ -15,6 +16,7 @@ Vue.component('room-messages', {
                 <ul v-if="messages.length > 0">
                     <li v-for="message in messages" :key="message.id">
                         <div class="message-content">
+                            <span class="message-author"> {{ currentUser.name }}</span>
                             <span v-if="editingMessage !== message.id">{{ message.payload }}</span>
                             <input v-else v-model="editedPayload" @keyup.enter="updateMessage(message)" />
                                 <div class="message-actions">
@@ -36,8 +38,29 @@ Vue.component('room-messages', {
     mounted() {
         console.log('Mounted with roomId:', this.$route.params.roomId);
         this.fetchMessages();
+        this.fetchUser();
     },
     methods: {
+        fetchUser() {
+            fetch('/api/user/current',  {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                this.currentUser = data;
+            })
+            .catch(error => {
+                console.error('Error fetching current user:', error);
+            });
+        },
         fetchMessages() {
             if (this.$route.params.roomId) {
                 fetch(`/api/messages/${this.$route.params.roomId}/0`, {
