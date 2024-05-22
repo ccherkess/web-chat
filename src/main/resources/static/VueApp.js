@@ -1,4 +1,12 @@
 
 const app = new Vue({
-    router: router
+    data: {
+        frontendData: window.frontendData || {}
+    },
+    router: router,
+    provide() {
+        return {
+            frontendData: this.frontendData
+        };
+    }
 }).$mount('#app');;

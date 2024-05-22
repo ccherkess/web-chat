@@ -1,9 +1,9 @@
 
 Vue.component('room-list', {
+    inject: ['frontendData'],
     data: function() {
        return {
-            rooms: [],
-            isAdmin: window.appData ? window.appData.isAdmin : false
+            rooms: []
        };
     },
     template: `
@@ -15,12 +15,12 @@ Vue.component('room-list', {
                     </li>
                 </ul>
                 <p v-else>No rooms available</p>
-                <router-link v-if="isAdmin" to="/admin">Admin Page</router-link>
+                <router-link v-if="frontendData.isAdmin" to="/admin">Admin Page</router-link>
         </div>
     `,
     mounted() {
         this.fetchRooms();
-        console.log("isAdmin in Vue component:", this.isAdmin);
+        console.log("isAdmin in Vue component:", this.frontendData.isAdmin);
     },
     methods: {
         fetchRooms() {

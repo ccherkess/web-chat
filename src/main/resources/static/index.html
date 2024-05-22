@@ -11,7 +11,7 @@
     <script src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>
     <link rel="stylesheet" href="components/styleForClientPage.css">
     <script th:inline="javascript">
-        var frontendData = /*[[${frontendData}]]*/ {};
+        window.frontendData = /*[[${frontendData}]]*/ {};
         console.log("frontendData.isAdmin", frontendData.isAdmin);
     </script>
 </head>
