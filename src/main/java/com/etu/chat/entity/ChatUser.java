@@ -60,4 +60,5 @@ public class ChatUser {
             inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT)
     )
     private List<Room> rooms = new ArrayList<>();
+
 }

@@ -27,10 +27,10 @@ Vue.component('room-messages', {
                         </div>
                     </li>
                 </ul>
-                <p v-else>No messages available</p>
+                <p v-else>It is quiet here at the moment.. Be the first to write something!</p>
             </div>
             <form @submit.prevent="sendMessage">
-                <input v-model="newMessage" placeholder="Type a message" required />
+                <input v-model="newMessage" placeholder="Write a message..." required />
                 <button type="submit">Send</button>
             </form>
         </div>

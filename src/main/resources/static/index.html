@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +9,23 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
     <script src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>
-    <link rel="stylesheet" href="clientPage/styleForClientPage.css">
+    <link rel="stylesheet" href="components/styleForClientPage.css">
+    <script>
+        window.appData = {
+            isAdmin: /*[[${isAdmin}]]*/ false
+        };
+        console.log("isAdmin from Thymeleaf:", window.appData.isAdmin);
+    </script>
 </head>
 <body>
-<div id="app">
-    <router-view></router-view>
-</div>
+    <div id="app">
+        <router-view></router-view>
+    </div>
 
-<script src="clientPage/js/clientPage.js"></script>
-<script src="clientPage/js/chatPage.js"></script>
-<script src="router/Router.js"></script>
-<script src="VueApp.js"></script>
+    <script src="components/js/adminPage.js"></script>
+    <script src="components/js/clientPage.js"></script>
+    <script src="components/js/chatPage.js"></script>
+    <script src="router/Router.js"></script>
+    <script src="VueApp.js"></script>
 </body>
 </html>

@@ -60,4 +60,10 @@ public class UserController {
         return user.map(chatUser -> ResponseEntity.ok(chatUser.getName())).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/all")
+    @JsonView(Views.Low.class)
+    public Iterable<ChatUser> getAllUsers() {
+        return chatUserRepository.findAll();
+    }
+
 }
