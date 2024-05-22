@@ -18,22 +18,12 @@ public class MainController {
 
     @GetMapping("/")
     public String getMainPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        boolean isAdmin = false;
 
-        if (userDetails != null) {
-            Optional<ChatUser> user = chatUserRepository.findByName(userDetails.getUsername());
-            if (user.isPresent()) {
-                List<Authority> authorities = user.get().getAuthorities();
-                for (Authority authority : authorities) {
-                    if (authority.getName().equals("ROLE_ADMIN")) {
-                        isAdmin = true;
-                        break;
-                    }
-                }
-            }
-        }
-        model.addAttribute("isAdmin", isAdmin);
-
+        model.addAttribute(
+                "isAdmin",
+                userDetails.getAuthorities().stream()
+                        .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))
+        );
         return "index";
     }
 
