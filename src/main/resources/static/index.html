@@ -10,11 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.3"></script>
     <script src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>
     <link rel="stylesheet" href="components/styleForClientPage.css">
-    <script>
-        window.appData = {
-            isAdmin: /*[[${isAdmin}]]*/ false
-        };
-        console.log("isAdmin from Thymeleaf:", window.appData.isAdmin);
+    <script th:inline="javascript">
+        var frontendData = /*[[${frontendData}]]*/ {};
+        console.log("frontendData.isAdmin", frontendData.isAdmin);
     </script>
 </head>
 <body>
