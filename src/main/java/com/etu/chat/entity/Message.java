@@ -1,9 +1,8 @@
 package com.etu.chat.entity;
 
-import com.fasterxml.jackson.annotation.JacksonInject;
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.etu.chat.entity.json_view.Views;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@JsonView(Views.Low.class)
 @Table(name = "t_message")
 public class Message {
     @Id
@@ -30,9 +30,11 @@ public class Message {
     @Column(name = "c_payload")
     private String payload;
 
-    @Column(name = "c_user_id")
-    private Long userId = 1L;
+    @ManyToOne
+    @JoinColumn(name = "c_user_id", nullable = false)
+    private ChatUser user;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm")
     @CreationTimestamp
     @Column(name = "c_send_at")
     private LocalDateTime sendAt;

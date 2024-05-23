@@ -4,6 +4,7 @@ import com.etu.chat.message.MessageEvent;
 import com.etu.chat.message.MessageSendService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ class MessageListener {
 
     private final DataSource dataSource;
     private final MessageSendService messageSendService;
+    private final MessageEventDeserializer messageEventDeserializer;
 
     private final Thread listenerThread = new Thread(this::messageHandler, "message-listener");
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -33,6 +35,10 @@ class MessageListener {
 
     @PostConstruct
     void initialize() {
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(MessageEventImpl.class, messageEventDeserializer);
+        objectMapper.registerModule(module);
+
         try {
             connection = dataSource.getConnection();
         } catch (SQLException e) {

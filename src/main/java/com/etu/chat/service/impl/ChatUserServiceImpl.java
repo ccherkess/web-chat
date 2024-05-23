@@ -28,6 +28,11 @@ class ChatUserServiceImpl implements ChatUserService {
     }
 
     @Override
+    public Optional<ChatUser> find(long id) {
+        return repository.findById(id);
+    }
+
+    @Override
     @Transactional
     public void addAuthorityForUser(String username, Authority authority) {
         find(username).ifPresentOrElse(
