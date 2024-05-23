@@ -33,6 +33,11 @@
       </tr>
       </tbody>
     </table>
+    <div>
+      <h2>Create New Room</h2>
+      <input v-model="newRoomName" placeholder="Enter room name" />
+      <button @click="createRoom">Create Room</button>
+    </div>
   </div>
 </template>
 
@@ -41,7 +46,8 @@ export default {
   data() {
     return {
       rooms: [],
-      newUserNames: {}
+      newUserNames: {},
+      newRoomName: ''
     };
   },
   mounted() {
