@@ -1,7 +1,10 @@
 package com.etu.chat.controller;
 
+import com.etu.chat.dto.RoomWithUsers;
+import com.etu.chat.dto.UserWithAuthorities;
 import com.etu.chat.entity.Room;
 import com.etu.chat.entity.json_view.Views;
+import com.etu.chat.service.ChatUserService;
 import com.etu.chat.service.RoomService;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +14,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping(consumes = "application/json", path = "api/room")
 @RequiredArgsConstructor
 public class RoomController {
     private final RoomService roomService;
+    private final ChatUserService chatUserService;
 
     @GetMapping
     @JsonView(Views.Low.class)
@@ -27,6 +34,14 @@ public class RoomController {
     @JsonView(Views.Medium.class)
     public Room getRoom(@PathVariable Long id) {
         return roomService.getRoom(id);
+    }
+
+    @GetMapping("/fullInfo/{id}")
+    public ResponseEntity<RoomWithUsers> getRoomInfoWithUsers(@PathVariable Long id) {
+        List<UserWithAuthorities> usersWithAuthorities = roomService.getRoom(id).getChatUsers().stream()
+                .map(user -> chatUserService.serializeUserWithAuthorities(user, roomService.getRoom(id)))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new RoomWithUsers(id, roomService.getRoom(id).getName(), usersWithAuthorities));
     }
 
     @PostMapping("/create")

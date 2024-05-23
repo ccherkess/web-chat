@@ -1,5 +1,6 @@
 package com.etu.chat.service.impl;
 
+import com.etu.chat.dto.UserWithAuthorities;
 import com.etu.chat.entity.Authority;
 import com.etu.chat.entity.ChatUser;
 import com.etu.chat.entity.Room;
@@ -112,5 +113,11 @@ class ChatUserServiceImpl implements ChatUserService {
                     throw new RuntimeException();
                 }
         );
+    }
+
+    @Override
+    public UserWithAuthorities serializeUserWithAuthorities(ChatUser user, Room room) {
+
+        return new UserWithAuthorities(user.getName(), isCanReadRoom(user.getName(), room), isCanWriteRoom(user.getName(), room));
     }
 }
