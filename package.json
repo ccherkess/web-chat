@@ -1,5 +1,28 @@
 {
+  "name": "chat",
+  "version": "1.0.0",
+  "main": "webpack.config.js",
+  "repository": "https://github.com/ccherkess/web-chat.git",
+  "author": "ccherkess <misha.tcherkasov2015@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "webpack-dev-server"
+  },
   "dependencies": {
-    "vue-router": "^4.3.2"
+    "node": "^18.20.3",
+    "vue": "^2.5.17",
+    "vue-resource": "^1.5.1",
+    "vue-router": "^3.0.2",
+    "vuetify": "^1.3.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babel-loader": "^8.0.1",
+    "vue-loader": "^15.4.1",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.17.1",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.7"
   }
 }

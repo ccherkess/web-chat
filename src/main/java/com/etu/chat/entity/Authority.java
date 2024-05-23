@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = {"name"})
+@EqualsAndHashCode(exclude = {"id"})
 @Entity
 @Table(name = "t_authority")
 public class Authority {

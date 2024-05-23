@@ -11,6 +11,8 @@ spring:
   http:
     media-types:
       css: text/css
+  profiles:
+    active: dev
 
 server:
   port: 8080

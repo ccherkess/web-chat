@@ -13,16 +13,12 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer{
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/")
-                .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS));
-    }
+
     @Bean
     public WebServerFactoryCustomizer<ConfigurableWebServerFactory> webServerCustomizer() {
         return container -> {
             container.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/"));
         };
     }
+
 }
