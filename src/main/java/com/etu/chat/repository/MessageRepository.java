@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface MessageRepository extends CrudRepository<Message, Long> {
 
-    List<Message> findByRoomId(Long roomId, Pageable pageable);
+    List<Message> findByRoomIdAndIdBeforeOrderByIdDesc(Long roomId, Long startId, Pageable pageable);
+
+    List<Message> findByRoomIdOrderByIdDesc(Long roomId, Pageable pageable);
 
 }

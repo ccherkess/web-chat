@@ -9,4 +9,6 @@ public interface ChatUserRepository extends CrudRepository<ChatUser, Long> {
 
     Optional<ChatUser> findByName(String username);
 
+    Optional<ChatUser> findById(long id);
+
 }

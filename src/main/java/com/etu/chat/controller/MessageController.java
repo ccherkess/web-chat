@@ -1,49 +1,45 @@
 package com.etu.chat.controller;
 
 import com.etu.chat.entity.Message;
-import com.etu.chat.repository.MessageRepository;
-import com.etu.chat.repository.RoomRepository;
+import com.etu.chat.entity.json_view.Views;
+import com.etu.chat.service.MessageService;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping(consumes = "application/json", path = "api/messages")
 @RequiredArgsConstructor
 public class MessageController {
 
-    private final MessageRepository messageRepository;
-    private final RoomRepository roomRepository;
+    private final MessageService messageService;
 
-    @GetMapping("/{roomId}/{page}")
-    public Iterable<Message> getRoomMessage(@PathVariable Long roomId, @PathVariable Integer page) {
-        return messageRepository.findByRoomId(roomId, PageRequest.of(page, 25));
+    @JsonView(Views.Low.class)
+    @GetMapping(value = {"/{roomId}/{count}", "/{roomId}/{count}/{startId}"})
+    public Iterable<Message> getRoomMessage(@PathVariable Long roomId, @PathVariable Integer count, @PathVariable(required = false) Long startId) {
+        return startId != null
+                ? messageService.getMessagesFromRoom(roomId, count, startId)
+                : messageService.getMessagesFromRoom(roomId, count);
     }
 
+    @JsonView(Views.Low.class)
     @PostMapping("/send")
-    public Message sendToRoom(@RequestBody Message message) {
-        roomRepository.findById(message.getRoomId()).orElseThrow();
-
-        return messageRepository.save(message);
+    public Message sendToRoom(@RequestBody Message message, @AuthenticationPrincipal User user) {
+        return messageService.save(message, user.getUsername());
     }
 
+    @JsonView(Views.Low.class)
     @PutMapping("/edit")
     public Message editMessage(@RequestBody Message message) {
-        Optional<Message> messageFromDb = messageRepository.findById(message.getId());
-
-        messageFromDb.ifPresent(m -> m.setPayload(message.getPayload()));
-
-        return messageRepository.save(messageFromDb.orElseThrow());
+        return messageService.edit(message);
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteMessage(@RequestBody Message message) {
-        Message messageFromDB = messageRepository.findById(message.getId()).orElseThrow(() -> new RuntimeException("Message not found!"));
-
-        messageRepository.delete(message);
+        messageService.delete(message);
 
         return ResponseEntity.ok("Message deleted successfully!");
     }

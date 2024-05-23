@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = {"name"})
+@ToString(exclude = {"password", "authorities", "rooms"})
 @Entity
 @Table(name = "t_user")
 public class ChatUser {

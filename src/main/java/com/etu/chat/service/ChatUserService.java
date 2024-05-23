@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface ChatUserService {
     Optional<ChatUser> find(String username);
 
+    Optional<ChatUser> find(long id);
+
     void addAuthorityForUser(String username, Authority authority);
 
     void removeAuthorityForUser(String username, Authority authority);
