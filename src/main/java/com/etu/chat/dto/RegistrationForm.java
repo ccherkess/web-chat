@@ -1,4 +1,4 @@
-package com.etu.chat.domain;
+package com.etu.chat.dto;
 
 import com.etu.chat.entity.ChatUser;
 import lombok.Data;

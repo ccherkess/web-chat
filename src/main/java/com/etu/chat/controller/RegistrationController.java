@@ -1,6 +1,6 @@
 package com.etu.chat.controller;
 
-import com.etu.chat.domain.RegistrationForm;
+import com.etu.chat.dto.RegistrationForm;
 import com.etu.chat.repository.ChatUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
