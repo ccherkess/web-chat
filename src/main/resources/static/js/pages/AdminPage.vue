@@ -17,7 +17,7 @@
         </td>
         <td v-if="room.showDetails">
           <ul>
-            <li v-for="user in room.chatUsers" :key="user.id">{{ user.name }}</li>
+>>>>>>> e127bcd (refactor adminPage)
             <li v-for="user in room.users" :key="user.name">
               {{ user.name }} - Read: {{ user.read ? 'Yes' : 'No' }}, Write: {{ user.write ? 'Yes' : 'No' }}
             </li>
