@@ -4,8 +4,7 @@
     <table>
       <thead>
       <tr>
-        <th>Room</th>
-        <th>Add User</th>
+        <th>Rooms</th>
       </tr>
       </thead>
       <tbody>
@@ -17,15 +16,19 @@
         </td>
         <td v-if="room.showDetails">
           <ul>
->>>>>>> e127bcd (refactor adminPage)
             <li v-for="user in room.users" :key="user.name">
               {{ user.name }} - Read: {{ user.read ? 'Yes' : 'No' }}, Write: {{ user.write ? 'Yes' : 'No' }}
+              <button @click="toggleWritePermission(room.roomId, user.name, !user.write)">
+                {{ user.write ? 'Disable Write' : 'Enable Write' }}
+              </button>
+              <button @click="removeUserFromRoom(room.roomId, user.name)">Remove</button>
             </li>
           </ul>
         </td>
         <td v-if="room.showDetails">
           <input v-model="newUserNames[room.roomId]" placeholder="Enter username" />
           <button @click="addUserToRoom(room.roomId)">Add User</button>
+          <button @click="deleteRoom(room.roomId)">Delete Room</button>
         </td>
       </tr>
       </tbody>
@@ -114,6 +117,103 @@ export default {
           })
           .catch(error => {
             console.error('Error adding user to room:', error);
+          });
+    },
+    toggleWritePermission(roomId, username, enableWrite) {
+      const url = enableWrite ? `/api/room/user/enable/write/${username}` : `/api/room/user/disable/write/${username}`;
+
+      fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: roomId })
+      })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.text();
+          })
+          .then(message => {
+            alert(message);
+            this.fetchRooms();
+          })
+          .catch(error => {
+            console.error('Error toggling write permission:', error);
+          });
+    },
+    removeUserFromRoom(roomId, username) {
+      fetch(`/api/room/user/delete/${username}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: roomId })
+      })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.text();
+          })
+          .then(message => {
+            alert(message);
+            this.fetchRooms();
+          })
+          .catch(error => {
+            console.error('Error removing user from room:', error);
+          });
+    },
+    createRoom() {
+      const roomName = this.newRoomName;
+      if (!roomName) {
+        alert('Please enter a room name');
+        return;
+      }
+
+      fetch('/api/room/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: roomName })
+      })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(room => {
+            alert(`Room "${room.name}" created successfully!`);
+            this.newRoomName = '';
+            this.fetchRooms();
+          })
+          .catch(error => {
+            console.error('Error creating room:', error);
+          });
+    },
+    deleteRoom(roomId) {
+      fetch('/api/room/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: roomId })
+      })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.text();
+          })
+          .then(message => {
+            alert(message);
+            this.fetchRooms();
+          })
+          .catch(error => {
+            console.error('Error deleting room:', error);
           });
     }
   }
