@@ -1,4 +1,4 @@
-package com.etu.chat.message;
+package com.etu.chat.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

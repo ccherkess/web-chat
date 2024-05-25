@@ -2,68 +2,106 @@
     <div class = "container">
         <h1 class="room-title, header-label">Сообщения в канале {{ $route.params.id }}</h1>
 
-        <div class="messages-container" id="div">
+        <div class="messages-container" id="scroll">
             <div v-for="message in messages" :key="message.id">
-                <div class="message-container">
+                <div class="message-container" @click="showModal(message)">
                     <div class = "message-author">{{ message.user.name }}</div>
                     <span class = "message-content">{{ message.payload }}</span>
                     <div class = "timestamp">{{ message.sendAt }}</div>
                 </div>
             </div>
-            <div id="scroll">
-                <h2>Все сообщения прочитаны</h2>
-            </div>
         </div>
-
         <div class = "send-form">
             <form @submit.prevent="sendMessage">
                 <input v-model="newMessage" placeholder="Введите сообщение" required class = "input-message"/>
                 <button type="submit" class = "send-button">Отправить</button>
             </form>
         </div>
+
+        <modal-window ref="editModal">
+            <template v-slot:body>
+                <div class = "edit-container">
+                       <input v-model="selectMessage.payload" required class = "edit-input"/>
+                       <div class = "edit-buttons-container">
+                           <button type="submit" class="edit-button" @click="updateMessage">Редактировать</button>
+                           <button type="submit" class="edit-button" @click="deleteMessage">Удалить</button>
+                       </div>
+                </div>
+            </template>
+        </modal-window>
     </div>
 </template>
 
 <script>
     import socket from '../util/socket'
+    import ModalWindow from '../components/ModalWindow.vue'
 
      export default {
-            props: ['roomId'],
+            props: [
+               'frontendData',
+               'roomId'
+            ],
+            components: {
+               ModalWindow
+            },
             data() {
                 return {
                     messages: [],
                     newMessage: '',
-                    editingMessage: null,
-                    editedPayload: '',
-                    isMessagesNotEnd: true,
-                    currentUser: {}
+                    selectMessage: '',
+                    isMessagesNotEnd: false,
+                    scroll: null
                 };
             },
             mounted() {
                 console.log('Mounted with roomId:', this.$route.params.roomId);
+                this.scroll = document.getElementById('scroll');
+                this.scrollListener();
                 this.fetchMessages();
-
-                document.getElementById('div').addEventListener('scroll', e => {
-                    if (document.getElementById('div').scrollTop == 0 && this.isMessagesNotEnd) {
-                        this.lazyFetchMessages();
-                    }
-                });
-
-                socket.subscribe('/room/' + this.$route.params.roomId + '/messages', message => this.handler(JSON.parse(JSON.parse(message.body))));
+                socket.subscribe('/room/' + this.$route.params.roomId + '/messages', m => this.handler(JSON.parse(JSON.parse(m.body))));
             },
             methods: {
-                handler(message) {
-                    console.log(message);
+                showModal(message) {
+                    if (message.user.name !== frontendData.username) {
+                        return;
+                    }
 
-                    switch(message.eventType) {
+                    this.selectMessage = message;
+                    this.$refs.editModal.show = true
+                },
+                hideModal() {
+                    this.$refs.editModal.show = false;
+                },
+                handler(event) {
+                    console.log(event);
+
+                    const payload = event.payload;
+
+                    switch(event.eventType) {
                         case 'CREATE':
-                            this.messages.push(message.message);
-                            this.scrollDown();
+                            this.messages.push(payload);
+                            setTimeout(() => this.scrollDown(), 100);
+                            break;
+                        case 'UPDATE':
+                            this.messages.find(m => m.id === payload.id).payload = payload.payload;
                             break;
                         case 'DELETE':
-                            this.messages = this.messages.filter(m => m.id !== message.message.id);
+                            this.messages = this.messages.filter(m => m.id !== payload.id);
                             break;
                     }
+                },
+                scrollDown() {
+                    this.scroll.scrollTop = this.scroll.scrollHeight;
+                },
+                scrollUp() {
+                    this.scroll.scrollTop = 1;
+                },
+                scrollListener() {
+                    this.scroll.addEventListener('scroll', e => {
+                        if (this.scroll.scrollTop == 0 && !this.isMessagesNotEnd) {
+                            this.lazyFetchMessages();
+                        }
+                    });
                 },
                 lazyFetchMessages() {
                     if (this.$route.params.roomId) {
@@ -81,9 +119,9 @@
                         })
                         .then(data => {
                             console.log(data);
-                            this.isMessagesNotEnd = data.length > 0;
+                            this.isMessagesNotEnd = data.length == 0;
                             data.forEach(el => this.messages.unshift(el));
-                            document.getElementById('div').scrollTop = 10;
+                            this.scrollUp();
                         })
                         .catch(error => {
                             console.error('Error fetching messages:', error);
@@ -91,11 +129,6 @@
                     } else {
                         console.error('Room ID is undefined');
                     }
-                },
-                scrollDown() {
-                    var myElement = document.getElementById('scroll');
-                    var topPos = myElement.offsetDown;
-                    document.getElementById('div').scrollTop = document.getElementById('div').scrollHeight + 100;
                 },
                 fetchMessages() {
                     if (this.$route.params.roomId) {
@@ -122,6 +155,10 @@
                     }
                 },
                 sendMessage() {
+                    if (this.newMessage.replace(/^\s+|\s+$/g, '').length < 1) {
+                        return;
+                    }
+
                     fetch('/api/messages/send', {
                         method: 'POST',
                         headers: {
@@ -142,43 +179,34 @@
                         console.error('Error sending message:', error);
                     });
                 },
-                editMessage(message) {
-                    this.editingMessage = message.id;
-                    this.editedPayload = message.payload;
-                },
-                updateMessage(message) {
+                updateMessage() {
+                    this.hideModal();
                     fetch('/api/messages/edit', {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ "id": message.id, "payload": this.editedPayload })
+                        body: JSON.stringify({ "id": this.selectMessage.id, "payload": this.selectMessage.payload })
                     })
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        const index = this.messages.findIndex(m => m.id === message.id);
-                        if (index !== -1) {
-                            this.messages.splice(index, 1, data);
-                        }
-                        this.editingMessage = null;
-                        this.editedPayload = '';
+
+                        return response.text();
                     })
                     .catch(error => {
                         console.error('Error updating message:', error);
                     });
                 },
-                deleteMessage(message) {
+                deleteMessage() {
+                    this.hideModal();
                     fetch('/api/messages/delete', {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ "id": message.id })
+                        body: JSON.stringify({ "id": this.selectMessage.id })
                     })
                     .then(response => {
                         if (!response.ok) {
@@ -225,11 +253,11 @@
         width: 20%;
         height: 5vh;
         border-radius: 16px;
+        border: 2px solid black;
         font-size: 24px;
-        background: rgba(40, 40, 255, 0.61);
     }
     .messages-container {
-        overflow: auto;
+        overflow-y: auto;
         width: 100%;
         height: 85%;
         border: 2px solid black;
@@ -239,11 +267,11 @@
       width: 0;
     }
     .message-container {
-        width: 50%;
+        width: 96%;
         margin: 2%;
         padding: 1% 2% 2% 2%;
         border-radius: 16px;
-        background: rgba(40, 40, 255, 0.61);
+        border: 2px solid black;;
     }
     .message-content {
         word-wrap: break-word;
@@ -253,15 +281,33 @@
         font-size: 20px;
         text-decoration: underline;
     }
-    .message-not-available {
-
-    }
     .timestamp {
         font-size: 12px;
         text-align: right;
     }
-    #scroll {
-        margin: 5vh auto;
+    .edit-container {
+        width: 40vw;
+        border-radius: 16px;
+        padding: 8px;
+        border: 4px solid black;
+        background: white;
         text-align: center;
+    }
+    .edit-input {
+         width: 90%;
+         height: 4vh;
+         border: 2px solid black;
+         border-radius: 16px;
+         padding: 1vh;
+         font-size: 24px;
+    }
+    .edit-button {
+         border-radius: 16px;
+         border: 2px solid black;
+         font-size: 24px;
+         padding: 4px;
+    }
+    .edit-buttons-container {
+        margin-top: 1vh;
     }
 </style>

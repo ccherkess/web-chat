@@ -27,7 +27,7 @@ public class MainController {
     public String main(Model model, @AuthenticationPrincipal User user) {
         HashMap<Object, Object> data = new HashMap<>();
 
-        data.put("profile", user);
+        data.put("username", user.getUsername());
         data.put("isAdmin", chatUserService.hasAuthority(user.getUsername(), Authority.builder().name("ROLE_ADMIN").build()));
 
         model.addAttribute("frontendData", data);

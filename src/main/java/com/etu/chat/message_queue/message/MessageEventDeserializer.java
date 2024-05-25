@@ -1,9 +1,8 @@
-package com.etu.chat.message.impl;
+package com.etu.chat.message_queue.message;
 
 import com.etu.chat.entity.Message;
-import com.etu.chat.message.MessageEvent;
 import com.etu.chat.service.ChatUserService;
-import com.fasterxml.jackson.core.JacksonException;
+import com.etu.chat.websocket.Event;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -17,17 +16,17 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 @RequiredArgsConstructor
-class MessageEventDeserializer extends JsonDeserializer<MessageEventImpl> {
+class MessageEventDeserializer extends JsonDeserializer<MessageEvent> {
 
     private final ChatUserService chatUserService;
 
     @Override
-    public MessageEventImpl deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        MessageEventImpl messageEvent = new MessageEventImpl();
+    public MessageEvent deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        MessageEvent messageEvent = new MessageEvent();
         Message message = new Message();
 
         JsonNode node = p.getCodec().readTree(p);
-        messageEvent.setEventType(MessageEvent.EventType.valueOf(node.get("eventType").asText()));
+        messageEvent.setEventType(Event.EventType.valueOf(node.get("eventType").asText()));
 
         node = node.get("message");
         message.setId(node.get("id").asLong());
@@ -37,7 +36,7 @@ class MessageEventDeserializer extends JsonDeserializer<MessageEventImpl> {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         message.setSendAt(LocalDateTime.parse(node.get("c_send_at").asText().split("\\.")[0], formatter));
 
-        messageEvent.setMessage(message);
+        messageEvent.setPayload(message);
 
         return messageEvent;
     }

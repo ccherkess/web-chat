@@ -81,6 +81,7 @@
         margin-top: 2vh;
     }
     .room-not-available {
-        margin: 2vh 0;
+        margin: 2vh auto;
+        text-align: center;
     }
 </style>

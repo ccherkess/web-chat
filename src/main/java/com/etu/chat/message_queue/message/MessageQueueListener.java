@@ -1,7 +1,9 @@
-package com.etu.chat.message.impl;
+package com.etu.chat.message_queue.message;
 
-import com.etu.chat.message.MessageEvent;
-import com.etu.chat.message.MessageSendService;
+import com.etu.chat.entity.Message;
+import com.etu.chat.entity.json_view.Views;
+import com.etu.chat.websocket.Event;
+import com.etu.chat.websocket.EventSendService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -21,22 +23,21 @@ import java.sql.Statement;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-class MessageListener {
+class MessageQueueListener {
     private static final String MESSAGE_QUEUE_CHANNEL = "message_queue";
 
     private final DataSource dataSource;
-    private final MessageSendService messageSendService;
+    private final EventSendService messageSendService;
     private final MessageEventDeserializer messageEventDeserializer;
-
+    private final ObjectMapper objectMapper;
     private final Thread listenerThread = new Thread(this::messageHandler, "message-listener");
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private Connection connection;
 
     @PostConstruct
     void initialize() {
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(MessageEventImpl.class, messageEventDeserializer);
+        module.addDeserializer(MessageEvent.class, messageEventDeserializer);
         objectMapper.registerModule(module);
 
         try {
@@ -86,10 +87,12 @@ class MessageListener {
     }
 
     private void messageProcessing(PGNotification message) throws JsonProcessingException {
-        MessageEvent messageEvent = objectMapper.readValue(message.getParameter(), MessageEventImpl.class);
+        Event<Message> messageEvent = objectMapper.readValue(message.getParameter(), MessageEvent.class);
 
         log.info("Received message: {} from channel: {}", messageEvent, MESSAGE_QUEUE_CHANNEL);
 
-        messageSendService.sendToRoom(messageEvent);
+        messageSendService.send(
+                messageEvent, objectMapper.setConfig(objectMapper.getSerializationConfig()).writerWithView(Views.Low.class)
+        );
     }
 }

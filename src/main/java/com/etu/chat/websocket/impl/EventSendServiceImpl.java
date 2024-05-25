@@ -1,8 +1,8 @@
-package com.etu.chat.message.impl;
+package com.etu.chat.websocket.impl;
 
 import com.etu.chat.entity.json_view.Views;
-import com.etu.chat.message.MessageEvent;
-import com.etu.chat.message.MessageSendService;
+import com.etu.chat.websocket.Event;
+import com.etu.chat.websocket.EventSendService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-class MessageSendServiceImpl implements MessageSendService {
+class EventSendServiceImpl implements EventSendService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final ExecutorService messageExecutor = Executors.newWorkStealingPool();
@@ -29,31 +29,31 @@ class MessageSendServiceImpl implements MessageSendService {
         messageExecutor.shutdown();
     }
 
-    @Override
-    public void sendToRoom(MessageEvent messageEvent) {
-        messageExecutor.submit(createMessageSendTask(messageEvent));
-    }
-
-    private Runnable createMessageSendTask(MessageEvent messageEvent) {
-        ObjectWriter writer = objectMapper.setConfig(objectMapper.getSerializationConfig())
-                .writerWithView(Views.Low.class);
-
+    private Runnable createMessageSendTask(Event<?> event, ObjectWriter objectWriter) {
         return () -> {
-            String messageEventAsString;
+            String eventAsString;
+
+            ObjectWriter writer = objectWriter != null ? objectWriter : objectMapper.writer();
 
             try {
-                messageEventAsString = writer.writeValueAsString(messageEvent);
+                eventAsString = writer.writeValueAsString(event);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
 
-            messagingTemplate.convertAndSendToUser(
-                    String.valueOf(messageEvent.getMessage().getRoomId()),
-                    "/messages",
-                    messageEventAsString
-            );
+            messagingTemplate.convertAndSend(event.getUrl(), eventAsString);
 
-            log.info("Send message into topic: /room/{}/messages", messageEvent.getMessage().getRoomId());
+            log.info("Send event {} to {}", event, event.getUrl());
         };
+    }
+
+    @Override
+    public void send(Event<?> event) {
+        messageExecutor.submit(createMessageSendTask(event, null));
+    }
+
+    @Override
+    public void send(Event<?> event, ObjectWriter writer) {
+        messageExecutor.submit(createMessageSendTask(event, writer));
     }
 }
