@@ -14,4 +14,5 @@ public interface MessageService {
 
     Message delete(Message message);
 
+    boolean canEdit(String username, Long id);
 }

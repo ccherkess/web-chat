@@ -2,10 +2,12 @@ package com.etu.chat.service.impl;
 
 import com.etu.chat.entity.ChatUser;
 import com.etu.chat.entity.Message;
+import com.etu.chat.entity.Room;
 import com.etu.chat.repository.MessageRepository;
 import com.etu.chat.repository.RoomRepository;
 import com.etu.chat.service.ChatUserService;
 import com.etu.chat.service.MessageService;
+import com.etu.chat.service.RoomService;
 import com.etu.chat.service.exception.MessageNotFoundException;
 import com.etu.chat.service.exception.RoomNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +16,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Service("messageService")
 @RequiredArgsConstructor
 class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final RoomRepository roomRepository;
+    private final RoomService roomService;
     private final ChatUserService chatUserService;
 
     @Override
@@ -36,8 +38,7 @@ class MessageServiceImpl implements MessageService {
 
     @Override
     public Message save(Message message, String username) {
-        roomRepository.findById(message.getRoomId()).orElseThrow(() -> new RoomNotFoundException(message.getRoomId()));
-
+        roomService.getRoom(message.getRoomId());
         ChatUser chatUser = chatUserService.find(username).orElseThrow(() -> new UsernameNotFoundException(username));
 
         return messageRepository.save(Message.builder()
@@ -64,5 +65,17 @@ class MessageServiceImpl implements MessageService {
                     messageRepository.delete(m);
                     return m;
                 }).orElseThrow(() -> new MessageNotFoundException(message.getId()));
+    }
+
+    @Override
+    @Transactional
+    public boolean canEdit(String username, Long id) {
+        return messageRepository.findById(id)
+                .map(message -> {
+                    Room room = roomService.getRoom(message.getRoomId());
+                    return chatUserService.isCanWriteRoom(username, room)
+                            && message.getUser().getName().equals(username);
+                })
+                .orElse(false);
     }
 }

@@ -4,15 +4,13 @@ import com.etu.chat.entity.json_view.Views;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(exclude = {"messages", "chatUsers"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -48,4 +46,11 @@ public class Room {
             inverseForeignKey = @ForeignKey(ConstraintMode.CONSTRAINT)
     )
     private List<ChatUser> chatUsers = new ArrayList<>();
+
+    public void addUser(ChatUser user) {
+        if (chatUsers == null) {
+            chatUsers = new ArrayList<>();
+        }
+        chatUsers.add(user);
+    }
 }

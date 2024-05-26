@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service("chatUserService")
 @RequiredArgsConstructor
@@ -30,6 +32,17 @@ class ChatUserServiceImpl implements ChatUserService {
     @Override
     public Optional<ChatUser> find(long id) {
         return repository.findById(id);
+    }
+
+    @Override
+    @Transactional
+    public boolean isInRoom(String username, Room room) {
+        return find(username)
+                .map(ChatUser::getRooms)
+                .map(Collection::stream)
+                .map(rooms -> rooms.filter(room::equals))
+                .flatMap(Stream::findAny)
+                .isPresent();
     }
 
     @Override

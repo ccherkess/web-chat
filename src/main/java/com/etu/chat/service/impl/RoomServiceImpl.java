@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 class RoomServiceImpl implements RoomService {
 
+    private final static String ADMIN = "admin";
+
     private final RoomRepository roomRepository;
     private final AuthorityService authorityService;
     private final ChatUserService chatUserService;
@@ -23,7 +25,7 @@ class RoomServiceImpl implements RoomService {
     @Override
     @Transactional
     public Iterable<Room> getAvailableRooms(String username) {
-        return username.equals("admin") ? roomRepository.findAll() : chatUserService.find(username)
+        return chatUserService.find(username)
                 .map(ChatUser::getRooms).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
@@ -35,6 +37,9 @@ class RoomServiceImpl implements RoomService {
                 .build());
 
         authorityService.createAuthorityForRoom(newRoom);
+
+        addUser(newRoom, ADMIN);
+        chatUserService.allowWriteRoom(newRoom, ADMIN, true);
 
         return newRoom;
     }
@@ -70,9 +75,11 @@ class RoomServiceImpl implements RoomService {
         Room roomFromDB = roomRepository.findById(room.getId())
                 .orElseThrow(() -> new RoomNotFoundException(room.getId()));
 
+        System.out.println(roomFromDB);
+
        chatUserService.find(username).ifPresentOrElse(
                 user -> {
-                    roomFromDB.getChatUsers().add(user);
+                    roomFromDB.addUser(user);
                     roomRepository.save(roomFromDB);
                     chatUserService.allowReadRoom(roomFromDB, username, true);
                 },

@@ -12,6 +12,8 @@ public interface ChatUserService {
 
     Optional<ChatUser> find(long id);
 
+    boolean isInRoom(String username, Room room);
+
     void addAuthorityForUser(String username, Authority authority);
 
     void removeAuthorityForUser(String username, Authority authority);

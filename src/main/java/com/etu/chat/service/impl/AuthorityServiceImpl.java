@@ -7,7 +7,7 @@ import com.etu.chat.service.AuthorityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("authorityService")
 @RequiredArgsConstructor
 class AuthorityServiceImpl implements AuthorityService {
 
@@ -23,11 +23,21 @@ class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
+    public Authority getAuthorityForReadRoom(Room room) {
+        return getAccessAuthorityRoom(AuthorityPattern.READ_ROOM, room);
+    }
+
+    @Override
+    public Authority getAuthorityForWriteRoom(Room room) {
+        return getAccessAuthorityRoom(AuthorityPattern.WRITE_ROOM, room);
+    }
+
+    @Override
     public void createAuthorityForRoom(Room room) {
-        repository.save(Authority.builder().
+        Authority read = repository.save(Authority.builder().
                 name(getAuthorityName(AuthorityPattern.READ_ROOM, room.getId()))
                 .build());
-        repository.save(Authority.builder().
+        Authority write = repository.save(Authority.builder().
                 name(getAuthorityName(AuthorityPattern.WRITE_ROOM, room.getId()))
                 .build());
     }

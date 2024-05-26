@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(consumes = "application/json", path = "api/messages")
 @RequiredArgsConstructor
 public class MessageController {
-
     private final MessageService messageService;
 
     @JsonView(Views.Low.class)
-    @GetMapping(value = {"/{roomId}/{count}", "/{roomId}/{count}/{startId}"})
+    @GetMapping(value = {"/{roomId:\\d+}/{count:\\d+}", "/{roomId:\\d+}/{count}/{startId:\\d+}"})
     public Iterable<Message> getRoomMessage(@PathVariable Long roomId, @PathVariable Integer count, @PathVariable(required = false) Long startId) {
         return startId != null
                 ? messageService.getMessagesFromRoom(roomId, count, startId)
@@ -26,19 +25,22 @@ public class MessageController {
     }
 
     @JsonView(Views.Low.class)
-    @PostMapping("/send")
-    public Message sendToRoom(@RequestBody Message message, @AuthenticationPrincipal User user) {
+    @PostMapping("/send/{roomId:\\d+}")
+    public Message sendToRoom(@RequestBody Message message, @PathVariable Long roomId, @AuthenticationPrincipal User user) {
+        message.setRoomId(roomId);
         return messageService.save(message, user.getUsername());
     }
 
     @JsonView(Views.Low.class)
-    @PutMapping("/edit")
-    public Message editMessage(@RequestBody Message message) {
+    @PutMapping("/edit/{id:\\d+}")
+    public Message editMessage(@RequestBody Message message, @PathVariable Long id) {
+        message.setId(id);
         return messageService.edit(message);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteMessage(@RequestBody Message message) {
+    @DeleteMapping("/delete/{id:\\d+}")
+    public ResponseEntity<String> deleteMessage(@RequestBody Message message, @PathVariable Long id) {
+        message.setId(id);
         messageService.delete(message);
 
         return ResponseEntity.ok("Message deleted successfully!");

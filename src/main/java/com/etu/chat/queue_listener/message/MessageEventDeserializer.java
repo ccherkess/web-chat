@@ -1,4 +1,4 @@
-package com.etu.chat.message_queue.message;
+package com.etu.chat.queue_listener.message;
 
 import com.etu.chat.entity.Message;
 import com.etu.chat.service.ChatUserService;

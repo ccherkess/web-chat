@@ -11,6 +11,10 @@ public interface AuthorityService {
 
     Authority getAccessAuthorityRoom(AuthorityPattern pattern, Room room);
 
+    Authority getAuthorityForReadRoom(Room room);
+
+    Authority getAuthorityForWriteRoom(Room room);
+
     void createAuthorityForRoom(Room room);
 
     void deleteAuthorityForRoom(Room room);
