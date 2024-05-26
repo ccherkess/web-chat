@@ -34,7 +34,6 @@
         height: 100%;
         width: 100%;
     }
-
     .modal {
         position: absolute;
         top: 50%;

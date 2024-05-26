@@ -12,10 +12,11 @@
             </div>
         </div>
         <div class = "send-form">
-            <form @submit.prevent="sendMessage">
+            <form @submit.prevent="sendMessage" v-if="canWrite">
                 <input v-model="newMessage" placeholder="Введите сообщение" required class = "input-message"/>
                 <button type="submit" class = "send-button">Отправить</button>
             </form>
+            <h2 v-else class="no-write">Вы не можете писать в этот канал</h2>
         </div>
 
         <modal-window ref="editModal">
@@ -50,19 +51,21 @@
                     newMessage: '',
                     selectMessage: '',
                     isMessagesNotEnd: false,
-                    scroll: null
+                    scroll: null,
+                    canWrite: false
                 };
             },
             mounted() {
                 console.log('Mounted with roomId:', this.$route.params.roomId);
                 this.scroll = document.getElementById('scroll');
+                this.fetchAuthority();
                 this.scrollListener();
                 this.fetchMessages();
                 socket.subscribe('/room/' + this.$route.params.roomId + '/messages', m => this.handler(JSON.parse(JSON.parse(m.body))));
             },
             methods: {
                 showModal(message) {
-                    if (message.user.name !== frontendData.username) {
+                    if ((message.user.name !== frontendData.username) && !frontendData.isAdmin) {
                         return;
                     }
 
@@ -102,6 +105,30 @@
                             this.lazyFetchMessages();
                         }
                     });
+                },
+                fetchAuthority() {
+                    if (this.$route.params.roomId) {
+                        fetch(`/api/user/authority/${this.$route.params.roomId}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            this.canWrite = data.canWrite;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching messages:', error);
+                        });
+                    } else {
+                        console.error('Room ID is undefined');
+                    }
                 },
                 lazyFetchMessages() {
                     if (this.$route.params.roomId) {
@@ -159,7 +186,7 @@
                         return;
                     }
 
-                    fetch('/api/messages/send', {
+                    fetch(`/api/messages/send/${this.$route.params.roomId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -181,7 +208,7 @@
                 },
                 updateMessage() {
                     this.hideModal();
-                    fetch('/api/messages/edit', {
+                    fetch(`/api/messages/edit/${this.selectMessage.id}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -201,7 +228,7 @@
                 },
                 deleteMessage() {
                     this.hideModal();
-                    fetch('/api/messages/delete', {
+                    fetch(`/api/messages/delete/${this.selectMessage.id}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
@@ -222,7 +249,7 @@
         }
 </script>
 
-<style>
+<style scoped>
     .container {
         margin: 5% auto;
         width: 50vw;
@@ -309,5 +336,8 @@
     }
     .edit-buttons-container {
         margin-top: 1vh;
+    }
+    .no-write {
+        text-align: center;
     }
 </style>

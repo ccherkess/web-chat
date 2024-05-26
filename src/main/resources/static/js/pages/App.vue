@@ -13,5 +13,7 @@
 </script>
 
 <style>
-
+    * {
+       font-family: Futura,Trebuchet MS,Arial,sans-serif;
+    }
 </style>

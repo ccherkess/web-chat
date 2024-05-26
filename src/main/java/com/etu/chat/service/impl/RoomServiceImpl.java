@@ -23,6 +23,11 @@ class RoomServiceImpl implements RoomService {
     private final ChatUserService chatUserService;
 
     @Override
+    public Iterable<Room> getRooms() {
+        return roomRepository.findAll();
+    }
+
+    @Override
     @Transactional
     public Iterable<Room> getAvailableRooms(String username) {
         return chatUserService.find(username)
@@ -75,9 +80,7 @@ class RoomServiceImpl implements RoomService {
         Room roomFromDB = roomRepository.findById(room.getId())
                 .orElseThrow(() -> new RoomNotFoundException(room.getId()));
 
-        System.out.println(roomFromDB);
-
-       chatUserService.find(username).ifPresentOrElse(
+        chatUserService.find(username).ifPresentOrElse(
                 user -> {
                     roomFromDB.addUser(user);
                     roomRepository.save(roomFromDB);

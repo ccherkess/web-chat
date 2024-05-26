@@ -52,6 +52,8 @@ public class SecurityConfig {
                 .access(getWebExpressionAuthorizationManager(SecurityExpression.ROOM_MESSAGE_WRITE))
             .requestMatchers("/api/messages/edit/{id:\\d+}", "/api/messages/delete/{id:\\d+}")
                 .access(getWebExpressionAuthorizationManager(SecurityExpression.MESSAGE_EDIT))
+            .requestMatchers("/api/user/room/not/{roomId:\\d+}")
+                .hasAuthority("ROLE_ADMIN")
             .anyRequest().authenticated();
     }
 

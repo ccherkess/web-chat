@@ -3,11 +3,13 @@ package com.etu.chat.service;
 import com.etu.chat.entity.Authority;
 import com.etu.chat.entity.ChatUser;
 import com.etu.chat.entity.Room;
-import com.etu.chat.dto.UserWithAuthorities;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ChatUserService {
+    List<ChatUser> findAll();
+
     Optional<ChatUser> find(String username);
 
     Optional<ChatUser> find(long id);
@@ -27,6 +29,4 @@ public interface ChatUserService {
     boolean isCanWriteRoom(String username, Room room);
 
     void allowWriteRoom(Room room, String username, boolean isAllow);
-
-    UserWithAuthorities serializeUserWithAuthorities(ChatUser user, Room room);
 }

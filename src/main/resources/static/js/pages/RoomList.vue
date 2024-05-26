@@ -1,6 +1,9 @@
 <template>
     <div class = "container">
-        <h1 class = "header-label">Список доступных каналов:</h1>
+         <router-link class = "admin" v-if="frontendData.isAdmin" tag = "button"  to="/admin">
+            <h2>Страница админа</h2>
+        </router-link>
+        <h1 class = "header-label">Список доступных каналов</h1>
         <div v-if="rooms.length > 0">
             <div v-for="room in rooms" :key="room.id" class = "room-item">
                 <router-link :to="'/room/' + room.id" tag = "button" class = "room-button">
@@ -9,12 +12,6 @@
             </div>
         </div>
         <h2 v-else class = "room-not-available">Вы не состоите ни в одном канале :(</h2>
-
-        <div class = "room-item">
-            <router-link class = "room-button"  tag = "button" v-if="frontendData.isAdmin" to="/admin">
-                <h2>Страница админа</h2>
-            </router-link>
-        </div>
     </div>
 </template>
 
@@ -61,7 +58,15 @@
     }
 </script>
 
-<style>
+<style scoped>
+    .admin {
+        width: 100%;
+        border: 2px solid black;
+        border-radius: 16px;
+        text-align: center;
+        padding: 1vh;
+        margin: 1vh 0;
+    }
     .container {
         margin: 5% auto;
         width: 50vw;

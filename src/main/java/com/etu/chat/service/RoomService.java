@@ -3,6 +3,8 @@ package com.etu.chat.service;
 import com.etu.chat.entity.Room;
 
 public interface RoomService {
+    Iterable<Room> getRooms();
+
     Iterable<Room> getAvailableRooms(String username);
 
     Room getRoom(Long id);

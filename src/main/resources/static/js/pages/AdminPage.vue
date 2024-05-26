@@ -1,44 +1,16 @@
 <template>
-  <div>
-    <h1>Admin Page</h1>
-    <table>
-      <thead>
-      <tr>
-        <th>Rooms</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr v-for="room in rooms" :key="room.roomId">
-        <td @click="toggleRoomDetails(room.roomId)" style="cursor: pointer;">
-          {{ room.name }}
-          <span v-if="room.showDetails">▲</span>
-          <span v-else>▼</span>
-        </td>
-        <td v-if="room.showDetails">
-          <ul>
-            <li v-for="user in room.users" :key="user.name">
-              {{ user.name }} - Read: {{ user.read ? 'Yes' : 'No' }}, Write: {{ user.write ? 'Yes' : 'No' }}
-              <button @click="toggleWritePermission(room.roomId, user.name, !user.write)">
-                {{ user.write ? 'Disable Write' : 'Enable Write' }}
-              </button>
-              <button @click="removeUserFromRoom(room.roomId, user.name)">Remove</button>
-            </li>
-          </ul>
-        </td>
-        <td v-if="room.showDetails">
-          <input v-model="newUserNames[room.roomId]" placeholder="Enter username" />
-          <button @click="addUserToRoom(room.roomId)">Add User</button>
-          <button @click="deleteRoom(room.roomId)">Delete Room</button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-    <div>
-      <h2>Create New Room</h2>
-      <input v-model="newRoomName" placeholder="Enter room name" />
-      <button @click="createRoom">Create Room</button>
+    <div class="container">
+        <h1>Страница администрирования</h1>
+        <router-link to="/admin/room" tag = "button" class = "button">
+            <h2>Комнаты</h2>
+        </router-link>
+         <router-link to="/admin/room" tag = "button" class = "button">
+            <h2>Пользователи</h2>
+        </router-link>
+        <router-link to="/admin/room" tag = "button" class = "button">
+            <h2>Заявки</h2>
+        </router-link>
     </div>
-  </div>
 </template>
 
 <script>
@@ -46,8 +18,6 @@ export default {
   data() {
     return {
       rooms: [],
-      newUserNames: {},
-      newRoomName: ''
     };
   },
   mounted() {
@@ -61,115 +31,16 @@ export default {
           'Content-Type': 'application/json'
         }
       })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            const roomPromises = data.map(room =>
-                fetch(`/api/room/fullInfo/${room.id}`, {
-                  method: 'GET',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  }
-                })
-                    .then(response => {
-                      if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                      }
-                      return response.json();
-                    })
-            );
-
-            Promise.all(roomPromises).then(roomsWithUsers => {
-              this.rooms = roomsWithUsers.map(room => ({ ...room, showDetails: false }));
-              this.rooms.forEach(room => {
-                this.$set(this.newUserNames, room.roomId, '');
-              });
-            });
-          });
-    },
-    toggleRoomDetails(roomId) {
-      const room = this.rooms.find(room => room.roomId === roomId);
-      if (room) {
-        room.showDetails = !room.showDetails;
-      }
-    },
-    addUserToRoom(roomId) {
-      const username = this.newUserNames[roomId];
-      if (!username) {
-        alert('Please enter a username');
-        return;
-      }
-
-      fetch(`/api/room/user/add/${username}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id: roomId })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
       })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.text();
-          })
-          .then(message => {
-            alert(message);
-            this.fetchRooms();
-          })
-          .catch(error => {
-            console.error('Error adding user to room:', error);
-          });
-    },
-    toggleWritePermission(roomId, username, enableWrite) {
-      const url = enableWrite ? `/api/room/user/enable/write/${username}` : `/api/room/user/disable/write/${username}`;
-
-      fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id: roomId })
-      })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.text();
-          })
-          .then(message => {
-            alert(message);
-            this.fetchRooms();
-          })
-          .catch(error => {
-            console.error('Error toggling write permission:', error);
-          });
-    },
-    removeUserFromRoom(roomId, username) {
-      fetch(`/api/room/user/delete/${username}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id: roomId })
-      })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.text();
-          })
-          .then(message => {
-            alert(message);
-            this.fetchRooms();
-          })
-          .catch(error => {
-            console.error('Error removing user from room:', error);
-          });
+      .then(data => this.rooms = data)
+      .catch(error => {
+          console.error('Error fetch room:', error);
+      });
     },
     createRoom() {
       const roomName = this.newRoomName;
@@ -226,6 +97,18 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+    .container {
+        margin: 5% auto;
+        width: 50vw;
+        border: 2px solid black;
+        border-radius: 16px;
+        position:relative;
+    }
+    .button {
+        height: 4vh;
+        width: 100%;
+        border: 2px solid black;
+        margin-top: 2vh;
+    }
 </style>

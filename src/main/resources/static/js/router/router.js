@@ -4,6 +4,7 @@ import App from 'pages/App.vue'
 import RoomList from 'pages/RoomList.vue'
 import RoomMessages from 'pages/RoomMessages.vue'
 import AdminPage from "../pages/AdminPage.vue";
+import AdminRoomList from "../pages/AdminRoomList.vue";
 
 Vue.use(VueRouter)
 
@@ -12,6 +13,7 @@ const routes = [
     { path: '/room/:roomId', component: RoomMessages, props: (route) => ({ roomId: route.params.roomId}) },
     { path: '*', component: RoomList },
     { path: '/admin', component: AdminPage },
+    { path: '/admin/room', component: AdminRoomList },
 ]
 
 export default new VueRouter({

@@ -1,6 +1,5 @@
 package com.etu.chat.service.impl;
 
-import com.etu.chat.dto.UserWithAuthorities;
 import com.etu.chat.entity.Authority;
 import com.etu.chat.entity.ChatUser;
 import com.etu.chat.entity.Room;
@@ -12,8 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service("chatUserService")
 @RequiredArgsConstructor
@@ -23,6 +25,12 @@ class ChatUserServiceImpl implements ChatUserService {
 
     private final ChatUserRepository repository;
     private final AuthorityService authorityService;
+
+    @Override
+    public List<ChatUser> findAll() {
+        return StreamSupport.stream(repository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public Optional<ChatUser> find(String username) {
@@ -131,11 +139,5 @@ class ChatUserServiceImpl implements ChatUserService {
                     throw new RuntimeException();
                 }
         );
-    }
-
-    @Override
-    public UserWithAuthorities serializeUserWithAuthorities(ChatUser user, Room room) {
-
-        return new UserWithAuthorities(user.getName(), isCanReadRoom(user.getName(), room), isCanWriteRoom(user.getName(), room));
     }
 }
