@@ -25,7 +25,7 @@ public class RegistrationRequest {
 
     @NotNull
     @Size(min = 2, max = 64, message = "Слишком короткое или длинное имя!")
-//    @UsernameNotTake(message = "Данное имя уже занято!")
+    @UsernameNotTake(message = "Данное имя уже занято!")
     @Column(name = "c_name")
     private String username;
 

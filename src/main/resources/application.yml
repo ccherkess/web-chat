@@ -8,6 +8,11 @@ spring:
       - public
   jpa:
     show-sql: true
+    properties:
+      javax:
+        persistence:
+          validation:
+            mode: none
   http:
     media-types:
       css: text/css

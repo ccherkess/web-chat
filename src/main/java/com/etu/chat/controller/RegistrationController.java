@@ -36,8 +36,10 @@ public class RegistrationController {
             return "registration";
         }
 
-        registrationRequest.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-        registrationRequestRepository.save(registrationRequest);
+        registrationRequestRepository.save(RegistrationRequest.builder()
+                .username(registrationRequest.getUsername())
+                .password(passwordEncoder.encode(registrationRequest.getPassword()))
+            .build());
 
         return "redirect: login";
     }

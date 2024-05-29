@@ -1,12 +1,12 @@
 package com.etu.chat.config;
 
+import com.etu.chat.valid.ValidatorProvider;
 import org.springframework.boot.web.server.ConfigurableWebServerFactory;
 import org.springframework.boot.web.server.ErrorPage;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer{
     }
 
     @Bean
-    public LocalValidatorFactoryBean localValidatorFactoryBean() {
-        return new LocalValidatorFactoryBean();
+    public ValidatorProvider validatorProvider() {
+        return ValidatorProvider.getInstance();
     }
 }
