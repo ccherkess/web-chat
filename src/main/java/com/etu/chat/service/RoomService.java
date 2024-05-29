@@ -2,10 +2,12 @@ package com.etu.chat.service;
 
 import com.etu.chat.entity.Room;
 
-public interface RoomService {
-    Iterable<Room> getRooms();
+import java.util.List;
 
-    Iterable<Room> getAvailableRooms(String username);
+public interface RoomService {
+    List<Room> getRooms();
+
+    List<Room> getAvailableRooms(String username);
 
     Room getRoom(Long id);
 

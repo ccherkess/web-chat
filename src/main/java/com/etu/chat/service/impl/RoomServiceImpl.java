@@ -12,6 +12,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.StreamSupport;
+
 @Service("roomService")
 @RequiredArgsConstructor
 class RoomServiceImpl implements RoomService {
@@ -23,13 +26,14 @@ class RoomServiceImpl implements RoomService {
     private final ChatUserService chatUserService;
 
     @Override
-    public Iterable<Room> getRooms() {
-        return roomRepository.findAll();
+    @Transactional
+    public List<Room> getRooms() {
+        return StreamSupport.stream(roomRepository.findAll().spliterator(), false).toList();
     }
 
     @Override
     @Transactional
-    public Iterable<Room> getAvailableRooms(String username) {
+    public List<Room> getAvailableRooms(String username) {
         return chatUserService.find(username)
                 .map(ChatUser::getRooms).orElseThrow(() -> new UsernameNotFoundException(username));
     }

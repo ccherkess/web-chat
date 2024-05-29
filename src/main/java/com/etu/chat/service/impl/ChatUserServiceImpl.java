@@ -27,12 +27,12 @@ class ChatUserServiceImpl implements ChatUserService {
     private final AuthorityService authorityService;
 
     @Override
-    public Iterable<ChatUser> getUsers(int count) {
+    public List<ChatUser> getUsers(int count) {
         return repository.findByOrderByIdDesc(Pageable.ofSize(count));
     }
 
     @Override
-    public Iterable<ChatUser> getUsers(int count, long startId) {
+    public List<ChatUser> getUsers(int count, long startId) {
         return repository.findByIdBeforeOrderByIdDesc(startId, Pageable.ofSize(count));
     }
 
@@ -110,10 +110,11 @@ class ChatUserServiceImpl implements ChatUserService {
     public boolean isCanReadRoom(String username, Room room) {
         Authority forReadRoom = authorityService.getAccessAuthorityRoom(AuthorityService.AuthorityPattern.READ_ROOM, room);
 
-        return hasAuthority(username, forReadRoom) || hasAuthority(username, ADMIN_AUTHORITY);
+        return hasAuthority(username, forReadRoom);
     }
 
     @Override
+    @Transactional
     public void allowReadRoom(Room room, String username, boolean isAllow) {
         find(username).ifPresentOrElse(
                 user -> {
@@ -135,10 +136,11 @@ class ChatUserServiceImpl implements ChatUserService {
     public boolean isCanWriteRoom(String username, Room room) {
         Authority forWriteRoom = authorityService.getAccessAuthorityRoom(AuthorityService.AuthorityPattern.WRITE_ROOM, room);
 
-        return hasAuthority(username, forWriteRoom) || hasAuthority(username, ADMIN_AUTHORITY);
+        return hasAuthority(username, forWriteRoom);
     }
 
     @Override
+    @Transactional
     public void allowWriteRoom(Room room, String username, boolean isAllow) {
         find(username).ifPresentOrElse(
                 user -> {

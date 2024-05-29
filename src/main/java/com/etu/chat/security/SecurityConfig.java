@@ -68,6 +68,7 @@ public class SecurityConfig {
             .httpBasic(Customizer.withDefaults())
             .formLogin(login -> login
                     .loginPage("/login")
+                    .defaultSuccessUrl("/")
                     .permitAll()
             );
 

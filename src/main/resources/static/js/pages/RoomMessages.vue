@@ -65,7 +65,7 @@
             },
             methods: {
                 showModal(message) {
-                    if ((message.user.name !== frontendData.username) && !frontendData.isAdmin) {
+                    if ((message.user.name !== frontendData.username || !this.canWrite) && !frontendData.isAdmin) {
                         return;
                     }
 

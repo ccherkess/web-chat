@@ -21,6 +21,8 @@
                         <h2>ID: {{ user.id }}</h2>
                     </div>
                     <button class="button" @click="deleteUserFromRoom(user)">Удалить из комнаты</button>
+                    <button class="button" v-if="user.authorities.length != 0" @click="enableWrite(user, false)">Запретить писать</button>
+                    <button class="button" v-else @click="enableWrite(user, true)">Разрешить писать</button>
                 </li>
             </ul>
          </div>
@@ -160,6 +162,27 @@
                 .catch(error => {
                     console.error('Error edit name room:', error);
                 });
+            },
+            enableWrite(user, enable) {
+                fetch(`/api/room/user/${enable ? 'enable' : 'disable'}/write/${user.name}`, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json'
+                },
+                    body: JSON.stringify({ id: this.room.id })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                         throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(unused => {
+                    user.authorities = enable ? [0] : [];
+                })
+                .catch(error => {
+                    console.error('Error edit name room:', error);
+               })
             }
         }
     }
@@ -187,8 +210,9 @@
     .button {
          border-radius: 16px;
          border: 2px solid black;
-         font-size: 24px;
+         font-size: 16px;
          padding: 6px;
+         margin-right: 1%;
     }
     .users-container {
         display: none;
