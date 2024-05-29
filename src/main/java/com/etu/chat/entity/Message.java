@@ -31,7 +31,7 @@ public class Message {
     private String payload;
 
     @ManyToOne
-    @JoinColumn(name = "c_user_id", nullable = false)
+    @JoinColumn(name = "c_user_id")
     private ChatUser user;
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm")

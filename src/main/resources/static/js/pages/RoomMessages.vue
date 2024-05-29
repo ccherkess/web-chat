@@ -5,7 +5,10 @@
         <div class="messages-container" id="scroll">
             <div v-for="message in messages" :key="message.id">
                 <div class="message-container" @click="showModal(message)">
-                    <div class = "message-author">{{ message.user.name }}</div>
+                    <div class = "message-author" >
+                      <span v-if="message.user != null"> {{ message.user.name }} </span>
+                      <span v-else> Удалённый аккаунт </span>
+                    </div>
                     <span class = "message-content">{{ message.payload }}</span>
                     <div class = "timestamp">{{ message.sendAt }}</div>
                 </div>
