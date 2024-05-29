@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<style>
+    .container {
+       margin: 5% auto;
+       width: 25vw;
+       border: 2px solid black;
+       border-radius: 16px;
+       position:relative;
+       padding: 2%;
+    }
+    .input {
+        width: 95%;
+        height: 4vh;
+        border: 2px solid black;
+        border-radius: 16px;
+        padding: 1vh;
+        font-size: 24px;
+        margin-top: 2%;
+    }
+    .button {
+        width: 100%;
+        border: 2px solid black;
+        border-radius: 16px;
+        padding: 1vh;
+        font-size: 24px;
+        margin-top: 2%;
+        background: none;
+    }
+    .error {
+        color: red;
+        text-align: center;
+    }
+</style>
+<body>
+    <div class="container">
+        <div class = "create-registration-request">
+            <div th:if="${param.error}" class="error">
+                Неверное имя или пароль
+            </div>
+            <form th:action="@{/login}" method="post">
+                <div>
+                    <input type="text" name="username" placeholder="Имя" class="input"/>
+                </div>
+                <div>
+                    <input type="password" name="password" placeholder="Пароль" class="input"/>
+                </div>
+                <input type="submit" value="Войти" class="button"/>
+            </form>
+            <form action="/registration">
+                <input type="submit" value="Зарегистрироваться" class="button"/>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

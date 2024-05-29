@@ -7,13 +7,13 @@ import com.etu.chat.repository.ChatUserRepository;
 import com.etu.chat.service.AuthorityService;
 import com.etu.chat.service.ChatUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -27,9 +27,18 @@ class ChatUserServiceImpl implements ChatUserService {
     private final AuthorityService authorityService;
 
     @Override
+    public Iterable<ChatUser> getUsers(int count) {
+        return repository.findByOrderByIdDesc(Pageable.ofSize(count));
+    }
+
+    @Override
+    public Iterable<ChatUser> getUsers(int count, long startId) {
+        return repository.findByIdBeforeOrderByIdDesc(startId, Pageable.ofSize(count));
+    }
+
+    @Override
     public List<ChatUser> findAll() {
-        return StreamSupport.stream(repository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
+        return StreamSupport.stream(repository.findAll().spliterator(), false).toList();
     }
 
     @Override
@@ -40,6 +49,11 @@ class ChatUserServiceImpl implements ChatUserService {
     @Override
     public Optional<ChatUser> find(long id) {
         return repository.findById(id);
+    }
+
+    @Override
+    public void delete(String username) {
+        repository.delete(find(username).orElseThrow());
     }
 
     @Override

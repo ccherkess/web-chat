@@ -31,6 +31,7 @@ public class ChatUser {
     @Column(name = "c_password")
     private String password;
 
+    @JsonView(Views.Medium.class)
     @ManyToMany(cascade = {
             CascadeType.DETACH,
             CascadeType.MERGE,

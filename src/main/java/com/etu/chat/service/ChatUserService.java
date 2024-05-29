@@ -2,17 +2,24 @@ package com.etu.chat.service;
 
 import com.etu.chat.entity.Authority;
 import com.etu.chat.entity.ChatUser;
+import com.etu.chat.entity.Message;
 import com.etu.chat.entity.Room;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ChatUserService {
+    Iterable<ChatUser> getUsers(int count);
+
+    Iterable<ChatUser> getUsers(int count, long startId);
+
     List<ChatUser> findAll();
 
     Optional<ChatUser> find(String username);
 
     Optional<ChatUser> find(long id);
+
+    void delete(String username);
 
     boolean isInRoom(String username, Room room);
 

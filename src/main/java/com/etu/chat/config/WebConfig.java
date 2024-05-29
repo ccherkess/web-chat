@@ -6,14 +6,21 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer{
-
     @Bean
     public WebServerFactoryCustomizer<ConfigurableWebServerFactory> webServerCustomizer() {
-        return container -> container.addErrorPages(new ErrorPage(HttpStatus.NOT_FOUND, "/"));
+        return container -> container.addErrorPages(
+                new ErrorPage(HttpStatus.NOT_FOUND, "/"),
+                new ErrorPage(HttpStatus.FORBIDDEN, "/")
+        );
     }
 
+    @Bean
+    public LocalValidatorFactoryBean localValidatorFactoryBean() {
+        return new LocalValidatorFactoryBean();
+    }
 }

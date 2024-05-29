@@ -7,7 +7,7 @@
                  <h2>Количество пользователей: {{room.chatUsers.length}}</h2>
              </div>
              <div class="room-actions">
-                 <button class="button" @click="deleteRoom">Удалить</button>
+                 <button class="button" @click="$emit('deleteRoom', room)">Удалить</button>
                  <button class="button" @click="showUsers">Пользователи</button>
              </div>
         </div>
@@ -28,7 +28,7 @@
           <modal-window ref="addUserModal">
              <template v-slot:body>
                 <div class="add-user-container">
-                    <h2>Выберити пользователя</h2>
+                    <h2>Выберите пользователя</h2>
                     <div class="add-user-item" v-for="user in usersNotInRoom" @click="addUserToRoom(user)">
                         <h2>Имя: {{ user.name }}</h2>
                         <h2>ID: {{ user.id }}</h2>
@@ -61,27 +61,6 @@
             hideModal() {
                 this.$refs.addUserModal.show = false;
                 this.userNotInRoom = [];
-            },
-            deleteRoom() {
-              fetch('/api/room/delete', {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: this.room.id})
-              })
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error('Network response was not ok');
-                }
-                return response.text();
-              })
-              .then(message => {
-
-              })
-              .catch(error => {
-                console.error('Error deleting room:', error);
-              });
             },
             editName(name) {
                 fetch('/api/room/edit', {
@@ -155,7 +134,7 @@
                     return response.text();
                  })
                  .then(unused => {
-                    const index = this.room.chatUsers.find(u => u.username === user.username);
+                    const index = this.room.chatUsers.findIndex(u => u.name === user.name);
                     this.room.chatUsers.splice(index, 1);
                  })
                  .catch(error => {

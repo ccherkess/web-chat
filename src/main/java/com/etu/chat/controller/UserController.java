@@ -3,15 +3,15 @@ package com.etu.chat.controller;
 import com.etu.chat.dto.UserRoomAuthority;
 import com.etu.chat.entity.ChatUser;
 import com.etu.chat.entity.Room;
+import com.etu.chat.entity.json_view.Views;
 import com.etu.chat.service.ChatUserService;
 import com.etu.chat.service.RoomService;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(consumes = "application/json", path = "api/user")
@@ -31,7 +31,23 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping(value = {"/all/{count:\\d+}", "/all/{count:\\d+}/{startId:\\d+}"})
+    @JsonView(Views.Low.class)
+    public Iterable<ChatUser> getUsers(@PathVariable Integer count, @PathVariable(required = false) Long startId) {
+        return startId != null
+                ? chatUserService.getUsers(count, startId)
+                : chatUserService.getUsers(count);
+    }
+
+    @DeleteMapping("/{username}")
+    public ResponseEntity<String> deleteUser(@PathVariable String username) {
+        chatUserService.delete(username);
+
+        return ResponseEntity.ok("User deleted");
+    }
+
     @GetMapping("/room/not/{roomId:\\d+}")
+    @JsonView(Views.Low.class)
     public Iterable<ChatUser> getUsersNotInRoom(@PathVariable Long roomId) {
         return chatUserService.findAll().stream()
                 .filter(chatUser -> !chatUserService.isInRoom(chatUser.getName(), roomService.getRoom(roomId)))

@@ -9,7 +9,7 @@
         </form>
         <div class="rooms-container" id="scroll">
             <div v-for="room in rooms" :key="room.id">
-                <RoomComponent :room = "room"/>
+                <RoomComponent :room = "room" @deleteRoom="deleteRoom"/>
             </div>
         </div>
     </div>
@@ -72,12 +72,33 @@
                 return response.json();
               })
               .then(room => {
-                alert(`Room "${room.name}" created successfully!`);
                 this.newRoomName = '';
                 this.fetchRooms();
               })
               .catch(error => {
                 console.error('Error creating room:', error);
+              });
+            },
+            deleteRoom(room) {
+              fetch('/api/room/delete', {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: room.id})
+              })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+                return response.text();
+              })
+              .then(unused => {
+                const index = this.rooms.findIndex(r => r.id === room.id);
+                this.rooms.splice(index, 1);
+              })
+              .catch(error => {
+                console.error('Error deleting room:', error);
               });
             },
         }

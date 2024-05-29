@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:form="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+</head>
+<style>
+    .container {
+       margin: 5% auto;
+       width: 25vw;
+       border: 2px solid black;
+       border-radius: 16px;
+       position:relative;
+       padding: 2%;
+    }
+    .input {
+        width: 95%;
+        height: 4vh;
+        border: 2px solid black;
+        border-radius: 16px;
+        padding: 1vh;
+        font-size: 24px;
+        margin-top: 2%;
+    }
+    .button {
+        width: 100%;
+        border: 2px solid black;
+        border-radius: 16px;
+        padding: 1vh;
+        font-size: 24px;
+        margin-top: 2%;
+        background: none;
+    }
+    .error {
+        color: red;
+        font-size: 24px;
+    }
+</style>
+<body>
+    <div class="container">
+        <div class = "create-registration-request">
+                <h2>Заявка на регистрацию</h2>
+                <form th:action="@{/registration}" method="POST" modelAttribute="form" th:object="${form}">
+                    <div th:if="${#fields.hasAnyErrors()}">
+                        <ul class="error">
+                            <li th:each="err : ${#fields.allErrors()}" th:text="${err}" class="error"/>
+                        </ul>
+                    </div>
+                    <div>
+                        <input for="username" type="text" name="username" placeholder="Имя" class="input"/>
+                    </div>
+                    <div>
+                        <input type="password" name="password" placeholder="Пароль" class="input"/>
+                    </div>
+                    <button type="submit" class="button">Отправить</button>
+                </form>
+        </div>
+    </div>
+</body>
+</html>

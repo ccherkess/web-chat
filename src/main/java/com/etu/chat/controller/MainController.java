@@ -24,7 +24,7 @@ public class MainController {
     private final ChatUserService chatUserService;
 
     @GetMapping
-    public String main(Model model, @AuthenticationPrincipal User user) {
+    public String getIndex(Model model, @AuthenticationPrincipal User user) {
         HashMap<Object, Object> data = new HashMap<>();
 
         data.put("username", user.getUsername());
@@ -36,4 +36,13 @@ public class MainController {
         return "index";
     }
 
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping("/logout")
+    public String logout() {
+        return "logout";
+    }
 }

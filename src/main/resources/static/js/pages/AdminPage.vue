@@ -4,10 +4,10 @@
         <router-link to="/admin/room" tag = "button" class = "button">
             <h2>Комнаты</h2>
         </router-link>
-         <router-link to="/admin/room" tag = "button" class = "button">
+         <router-link to="/admin/user" tag = "button" class = "button">
             <h2>Пользователи</h2>
         </router-link>
-        <router-link to="/admin/room" tag = "button" class = "button">
+        <router-link to="/admin/register" tag = "button" class = "button">
             <h2>Заявки</h2>
         </router-link>
     </div>

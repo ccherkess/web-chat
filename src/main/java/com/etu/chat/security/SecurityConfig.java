@@ -1,6 +1,5 @@
 package com.etu.chat.security;
 
-import com.etu.chat.security.filter.GetCsrfTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -8,16 +7,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.access.expression.DefaultHttpSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
-import org.springframework.security.web.csrf.CsrfAuthenticationStrategy;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
-import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableMethodSecurity
@@ -38,8 +34,10 @@ public class SecurityConfig {
 
     private void requestMatchersConfig(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests) {
         requests
-            .requestMatchers("/register/**")
+            .requestMatchers("/registration")
                 .anonymous()
+            .requestMatchers("/registration/**")
+                .hasAuthority("ROLE_ADMIN")
             .requestMatchers("/api/room")
                 .authenticated()
             .requestMatchers("/api/room/info/{id:\\d+}")
@@ -64,18 +62,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain appSecurityFilterChain(HttpSecurity http) throws Exception {
-        HttpSessionCsrfTokenRepository csrfTokenRepository = new HttpSessionCsrfTokenRepository();
-
         http
-            .addFilterAfter(new GetCsrfTokenFilter(), ExceptionTranslationFilter.class)
-            .csrf(csrf -> csrf.csrfTokenRequestHandler(new XorCsrfTokenRequestAttributeHandler())
-                    .csrfTokenRepository(csrfTokenRepository)
-                    .sessionAuthenticationStrategy(new CsrfAuthenticationStrategy(csrfTokenRepository))
-                    .ignoringRequestMatchers("/api/**")
-            )
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(this::requestMatchersConfig)
             .httpBasic(Customizer.withDefaults())
-            .formLogin(Customizer.withDefaults());
+            .formLogin(login -> login
+                    .loginPage("/login")
+                    .permitAll()
+            );
 
         return http.build();
     }
